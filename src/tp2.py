@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import numpy as np
 
 class GMap:
@@ -24,11 +27,11 @@ class GMap:
         """ 
         Return the application of a composition of alphas on dart 
         """
-        if list_of_alpha_value == [] :
-			return dart
-		else
-			return self.alpha_composed(list_of_alpha_value[:-1], self.alpha(list_of_alpha_value[-1], dart))
-
+        if list_of_alpha_value == []:
+            return dart
+        else:
+            return self.alpha_composed(list_of_alpha_value[:-1],self.alpha(list_of_alpha_value[-1],dart))
+		
     def is_free(self, degree, dart):
         """ 
         Test if dart is free for alpha_degree (if it is a fixed point) 
@@ -40,6 +43,7 @@ class GMap:
         Create a new dart and return its id. 
         Set its alpha_i to itself (fixed points) 
         """
+        dart = self.maxid
         self.maxid += 1
         for degree in self.alphas.keys():
 			self.alphas[degree][dart] = dart
@@ -55,7 +59,7 @@ class GMap:
         are_involutions = are_involutions and np.all([self.alpha_composed([0,0], dart) == dart for dart in self.darts()])
         are_involutions = are_involutions and np.all([self.alpha(1, dart) != dart for dart in self.darts()])
         are_involutions = are_involutions and np.all([self.alpha_composed([1,1], dart) == dart for dart in self.darts()])
-        are_involutions = are_involutions and np.all(self.alpha_composed([0,2], self.alpha_composed([0,2], dart)) == dart for dart in self.darts()])
+        are_involutions = are_involutions and np.all(self.alpha_composed([0,2, 0, 2], dart) == dart for dart in self.darts()])
         
         return are_involutions
 
@@ -81,3 +85,30 @@ class GMap:
             print "d     α0  α1  α2"
             for d in self.darts():
                 print d," | ",Fore.MAGENTA+str(self.alpha(0,d))," ",Fore.GREEN+str(self.alpha(1,d))," ",Fore.BLUE+str(self.alpha(2,d))," ",Style.RESET_ALL 
+	
+	
+	class GMap : (continued ..)
+
+    def orbit(self, dart, list_of_alpha_value):
+        """ 
+        Return the orbit of dart using a list of alpha relation.
+        Example of use : gmap.orbit(0,[0,1]).
+        """
+        result = []
+        marked = set([])
+        toprocess = [dart]
+		while len(toprocess) > 0:
+			d = toprocess.pop(0)
+			if not d in marked:
+				result.append(d)
+				marked.add(d)
+				for degree in list_of_alpha_value:
+					toprocess.append(self.alpha(degree, d))
+	
+        # Tant qu'il y a des elements à traiter
+            # prendre un element d à traiter
+            # si d n'est pas dans marked
+                # rajouter d dans result et dans marked
+                # pour chaque degree de list_of_alpha_value
+                    # rajouter alpha_degree(d) dans toprocess
+#Semaine prochaine TD 16.01

@@ -1,4 +1,6 @@
-from gmap import GMap
+# coding: utf8
+
+from tp2 import GMap
  
 def add_square(gmap):
     darts = [gmap.add_dart() for i in xrange(8)]
