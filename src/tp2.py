@@ -38,16 +38,22 @@ class GMap:
         """
         return self.alpha(degree, dart) == dart
 
-    def add_dart(self):
-        """ 
-        Create a new dart and return its id. 
-        Set its alpha_i to itself (fixed points) 
-        """
-        dart = self.maxid
-        self.maxid += 1
-        for degree in self.alphas.keys():
+	def add_dart(self):
+		""" 
+		Create a new dart and return its id. 
+		Set its alpha_i to itself (fixed points) 
+		""
+		dart = self.maxid
+		self.maxid += 1
+		for degree in self.alphas.keys():
 			self.alphas[degree][dart] = dart
+		return dart"""
+		dart = self.maxid
+		self.maxid += 1
+		for degree in self.alphas.keys():
+			self.alphas[degree]
 		return dart
+		
 
     def is_valid(self):
         """ 
@@ -59,7 +65,7 @@ class GMap:
         are_involutions = are_involutions and np.all([self.alpha_composed([0,0], dart) == dart for dart in self.darts()])
         are_involutions = are_involutions and np.all([self.alpha(1, dart) != dart for dart in self.darts()])
         are_involutions = are_involutions and np.all([self.alpha_composed([1,1], dart) == dart for dart in self.darts()])
-        are_involutions = are_involutions and np.all(self.alpha_composed([0,2, 0, 2], dart) == dart for dart in self.darts()])
+        are_involutions = are_involutions and np.all([self.alpha_composed([0,2, 0, 2], dart) == dart for dart in self.darts()])
         
         return are_involutions
 
@@ -87,16 +93,14 @@ class GMap:
                 print d," | ",Fore.MAGENTA+str(self.alpha(0,d))," ",Fore.GREEN+str(self.alpha(1,d))," ",Fore.BLUE+str(self.alpha(2,d))," ",Style.RESET_ALL 
 	
 	
-	class GMap : (continued ..)
-
-    def orbit(self, dart, list_of_alpha_value):
-        """ 
-        Return the orbit of dart using a list of alpha relation.
-        Example of use : gmap.orbit(0,[0,1]).
-        """
-        result = []
-        marked = set([])
-        toprocess = [dart]
+	def orbit(self, dart, list_of_alpha_value):
+		""" 
+		Return the orbit of dart using a list of alpha relation.
+		Example of use : gmap.orbit(0,[0,1]).
+		"""
+		result = []
+		marked = set([])
+		toprocess = [dart]
 		while len(toprocess) > 0:
 			d = toprocess.pop(0)
 			if not d in marked:
@@ -104,11 +108,63 @@ class GMap:
 				marked.add(d)
 				for degree in list_of_alpha_value:
 					toprocess.append(self.alpha(degree, d))
-	
-        # Tant qu'il y a des elements à traiter
-            # prendre un element d à traiter
-            # si d n'est pas dans marked
-                # rajouter d dans result et dans marked
-                # pour chaque degree de list_of_alpha_value
-                    # rajouter alpha_degree(d) dans toprocess
-#Semaine prochaine TD 16.01
+					
+	def elements(self, degree):
+		""" 
+        Return one dart per element of degree. For this, consider all darts as initial set S. 
+        Take the first dart d, remove from the set all darts of the orbit starting from d and 
+        corresponding to element of degree degree. Take then next element from set S and do the 
+        same until S is empty. 
+        Return all darts d that were used. 
+        """
+        elements = []
+        darts = set(self.darts())
+        
+        list_of_alpha_value = range(3)
+        list_of_alpha_value.remove(degree)
+        
+        while len(dart)  > 0:
+			dart = darts.pop()
+			elementi = self.orbit(dart, list_of_alpha_value)
+			darts -= set(elementi)
+			elements.append(dart)
+			
+		return elements
+        
+        
+	"""
+	PLONGEMENT GÉOMÉTRIQUE
+	"""
+	def get_embedding_dart(self, dart, propertydict):
+		""" 
+        Check if a dart of the orbit representing the vertex has already been 
+        associated with a value in propertydict. If yes, return this dart, else
+        return the dart passed as argument.
+        """
+        for d in self.orbit(dart, [1, 2]):
+			if propertydict.has_key(d):
+				return d
+		return dart
+		
+	def get_position(self, dart):
+		"""
+        Retrieve the coordinates associated to the vertex &lt;alpha_1, alpha_2&gt;(dart) 
+        """
+        return self.positions.get(self.get_embedding_dart(dart, self.positions))
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
