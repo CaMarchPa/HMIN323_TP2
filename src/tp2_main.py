@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+# -*- coding:Utf-8 -*
 
 from tp2 import GMap
  
@@ -16,7 +16,7 @@ def square():
     add_square(gmap)
     return gmap
 
- def cube(xsize = 5, ysize  = 5 , zsize = 5):
+def cube(xsize = 5, ysize  = 5 , zsize = 5):
     g = GMap()
     squares = [add_square(g) for i in xrange(6)]
  

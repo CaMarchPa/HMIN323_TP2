@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+# -*- coding:Utf-8 -
 
 import numpy as np
 
@@ -39,21 +39,13 @@ class GMap:
         return self.alpha(degree, dart) == dart
 
 	def add_dart(self):
-		""" 
-		Create a new dart and return its id. 
-		Set its alpha_i to itself (fixed points) 
-		""
-		dart = self.maxid
-		self.maxid += 1
-		for degree in self.alphas.keys():
-			self.alphas[degree][dart] = dart
-		return dart"""
+		"""
+		"""
 		dart = self.maxid
 		self.maxid += 1
 		for degree in self.alphas.keys():
 			self.alphas[degree]
-		return dart
-		
+		return dart		
 
     def is_valid(self):
         """ 
@@ -91,8 +83,7 @@ class GMap:
             print "d     α0  α1  α2"
             for d in self.darts():
                 print d," | ",Fore.MAGENTA+str(self.alpha(0,d))," ",Fore.GREEN+str(self.alpha(1,d))," ",Fore.BLUE+str(self.alpha(2,d))," ",Style.RESET_ALL 
-	
-	
+		
 	def orbit(self, dart, list_of_alpha_value):
 		""" 
 		Return the orbit of dart using a list of alpha relation.
@@ -108,6 +99,7 @@ class GMap:
 				marked.add(d)
 				for degree in list_of_alpha_value:
 					toprocess.append(self.alpha(degree, d))
+		return orbit
 					
 	def elements(self, degree):
 		""" 
@@ -129,11 +121,7 @@ class GMap:
 			elements.append(dart)
 			
 		return elements
-        
-        
-	"""
-	PLONGEMENT GÉOMÉTRIQUE
-	"""
+
 	def get_embedding_dart(self, dart, propertydict):
 		""" 
         Check if a dart of the orbit representing the vertex has already been 
@@ -180,14 +168,12 @@ class GMap:
 					if dart1_em in self.positions and dart2_em in self.positions:
 						new_position = (slef.positions[dart1_em] + self.positions[dart2_em]) / 2
 						del self.positions[dart2_em]
-						self.positions[dart1_em] = new_position
-						
+						self.positions[dart1_em] = new_position						
 	
 	def element_center(self, dart, degree):
 		list_of_alpha_value = range(3)
 		list_of_alpha_value.remove(degree)
 		return np.mean([self.get_position(d) for d in self.orbit(dart,list_of_alpha_value)])
-
 
 	def dart_display(self, radius=0.1, coef=0.8, add=False):
 		import openalea.plantgl.all as pgl
@@ -239,24 +225,37 @@ class GMap:
 			pgl.Viewer.display(s)
 
 	def display(self, color = (190,205,205), add = False):
-    """
-    Display the 2-cells of a 2-G-Map using the ordered orbit of its darts in PlantGL.
-    For each face element, retrieve the position of its ordered face darts and add a FaceSet PlantGL object to the scene.
-    Example : s += pgl.Shape(pgl.FaceSet( [[0,0,0],[1,0,0],[1,1,0],[0,1,0]], [[0,1,2,3]]) , pgl.Material((0,100,0))) # for a green square
-    """
-	
+		"""
+		Display the 2-cells of a 2-G-Map using the ordered orbit of its darts in PlantGL.
+		For each face element, retrieve the position of its ordered face darts and add a FaceSet PlantGL object to the scene.
+		Example : s += pgl.Shape(pgl.FaceSet( [[0,0,0],[1,0,0],[1,1,0],[0,1,0]], [[0,1,2,3]]) , pgl.Material((0,100,0))) # for a green square
+		"""
+		from openalea.plantgl.all import Scene, Shape, Material, FaceSet, Viewer
+		from random import randint
+		s = Scene()
+		for facedart in self.elements(2):
+			lastfart = facedart
+			positions = []
+			for dart in self.oderedorbit(facedart, [0, 1]):
+				if self.alpha(0, dart) != lastfart:
+					positions.append(self.get_position(dart))
+				lastfart = dart
+			if color is None:
+				mat = Material((randint(0, 255), randint(0, 255), randint(0, 255)))
+			else:
+				mat = Material(tuple(color), diffuse=0.25)
+			s.add(Shape(FaceSet(positions, [range(len(positions))]), mat, facedart))
+		if add :
+			Viewer.add(s)
+		else:
+			Viewer.display(s)	
+
 	def oderedorbit(self, dart, list_of_alpha_value):
-		 """
-        Return the ordered orbit of dart using a list of alpha relations by applying
-        repeatingly the alpha relations of the list to dart.
-        Example of use. gmap.orderedorbit(0,[0,1]).
-        Warning: No fixed point for the given alpha should be contained.
-        """
-        orbit = []
-        current_dart = dart
-        current_alpha_degree = 0
-        nbr_alpha = len(list_of_alpha_value)
-        while( current_dart != dart) or orbit == []:
+		orbit = []
+		current_dart = dart
+		current_alpha_degree = 0
+		nbr_alpha = len(list_of_alpha_value)
+		while( current_dart != dart) or orbit == []:
 			orbit.append(current_dart)
 			current_alpha = list_of_alpha_value[current_alpha_degree]
 			current_dart = self.alpha(current_alpha, current_dart)
@@ -264,17 +263,35 @@ class GMap:
 		return orbit
         
 	def eulercharacteristic(self):
-	"""
-	Compute the Euler-Poincare characteristic of the subdivision
-	"""
+		"""
+		Compute the Euler-Poincare characteristic of the subdivision
+		"""
+		faces = []
+		edges = []
+		vertices = []
+
+		for dart in self.darts():
+			orbit_face = self.orbit(dart, [0, 1])
+			orbit_edge = self.orbit(dart, [0, 2])
+			orbit_vertex = self.orbit(dart, [1, 2])
+			if orbit_face not in faces:
+				faces = [orbit_face]
+			if orbit_edge not in edges:
+				edges = [orbit_edge]
+			if orbit_vertex not in vertices:
+				vertices = [orbit_vertex]
+		n_faces = len(faces)
+		n_edges = len(edges)
+		n_vertices = len(vertices)
+		return n_vertices - n_edges + n_faces
+
 	
-	
-	def dual(self):
+	# def dual(self):
 	"""
 	Compute the dual of the object
 	Create a new GMap object with the same darts but reversed alpha relations
 	Update the positions of the dual 0-cells as the centers of the 2-cells
-	"""    
+	"""
         
         
         
